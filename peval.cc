@@ -175,14 +175,9 @@ WEVAL_DEFINE_GLOBALS();
 #endif
 
 int main(int argc, char **argv) {
-
   if (ExecuteSpecialized) {
     ExecuteSpecialized(nullptr);
   } else {
     Execute<false>(program);
   }
-
-  // uint32_t result = add_result(0, 0);
-  // std::cout << result << std::endl;
-  // return 0;
 }
