@@ -31,6 +31,7 @@ typedef enum {
 #undef ENUM
 } Instruction;
 
+template <bool IsSpecialized>
 static NEVER_INLINE Object Execute(uword *program) {
   Object accumulator = 0;
   Object locals[256] = {0};
@@ -39,6 +40,13 @@ static NEVER_INLINE Object Execute(uword *program) {
   Object tmp;
 #define DO_PUSH(x) (stack[sp++] = (x))
 #define DO_POP() (tmp = stack[--sp], stack[sp] = (Object)0, tmp)
+#define LOCAL_AT(idx) (IsSpecialized ? weval_read_reg(idx) : locals[idx])
+#define LOCAL_AT_PUT(idx, val)                                                 \
+  if (IsSpecialized) {                                                         \
+    weval_write_reg(idx, val);                                                 \
+  } else {                                                                     \
+    locals[idx] = val;                                                         \
+  }
 
   weval::push_context(0);
   uword pc = 0;
@@ -53,12 +61,12 @@ static NEVER_INLINE Object Execute(uword *program) {
     }
     case STORE_LOCAL: {
       uword idx = program[pc++];
-      locals[idx] = accumulator;
+      LOCAL_AT_PUT(idx, accumulator);
       break;
     }
     case LOAD_LOCAL: {
       uword idx = program[pc++];
-      accumulator = locals[idx];
+      accumulator = LOCAL_AT(idx);
       break;
     }
     case PRINT: {
@@ -91,7 +99,7 @@ static NEVER_INLINE Object Execute(uword *program) {
     case ADD: {
       uword idx1 = program[pc++];
       uword idx2 = program[pc++];
-      accumulator = locals[idx1] + locals[idx2];
+      accumulator = LOCAL_AT(idx1) + LOCAL_AT(idx2);
       break;
     }
     default: {
@@ -137,7 +145,7 @@ uword program[] = {
 void init() {
   uword result = 0;
   uword loopc = 1;
-  weval::weval(&ExecuteSpecialized, &Execute, 123,
+  weval::weval(&ExecuteSpecialized, &Execute<true>, 123,
                weval::SpecializeMemory<uword *>(program, sizeof program));
 }
 
@@ -150,7 +158,7 @@ int main(int argc, char **argv) {
   if (ExecuteSpecialized) {
     ExecuteSpecialized(nullptr);
   } else {
-    Execute(program);
+    Execute<false>(program);
   }
 
   // uint32_t result = add_result(0, 0);
