@@ -34,7 +34,11 @@ bench: peval.out peval.normal.cwasm peval.wevaled.cwasm
 	hyperfine \
 		"./peval.out" \
 		"../wasmtime/target/release/wasmtime run --allow-precompiled peval.normal.cwasm" \
-		"../wasmtime/target/release/wasmtime run --allow-precompiled peval.wevaled.cwasm"
+		"../wasmtime/target/release/wasmtime run --allow-precompiled peval.wevaled.cwasm" \
+		"node wrapper.mjs peval.normal.wasm" \
+		"node wrapper.mjs peval.wevaled.wasm" \
+		"~/.bun/bin/bun wrapper.mjs peval.normal.wasm" \
+		"~/.bun/bin/bun wrapper.mjs peval.wevaled.wasm"
 
 clean:
 	rm -f *.out *.wasm *.cwasm *.wat
