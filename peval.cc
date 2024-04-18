@@ -15,9 +15,9 @@
 #define ALWAYS_INLINE inline __attribute__((always_inline))
 #define NEVER_INLINE __attribute__((noinline))
 
-typedef intptr_t word;
-typedef uintptr_t uword;
-typedef uintptr_t Object;
+typedef int64_t word;
+typedef uint64_t uword;
+typedef uword Object;
 
 #define FOR_EACH_INSTRUCTION(V)                                                \
   V(LOAD_IMMEDIATE)                                                            \
@@ -91,7 +91,7 @@ static NEVER_INLINE Object Execute(uword *program) {
       break;
     }
     case PRINTI: {
-      printf("%ld", accumulator);
+      printf("%llu", accumulator);
       break;
     }
     case HALT: {
