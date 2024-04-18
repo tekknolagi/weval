@@ -62,7 +62,7 @@ static NEVER_INLINE Object Execute(uword *program) {
 #ifdef DO_WEVAL
   weval::push_context(0);
 #endif
-  uword pc = 0;
+  uint32_t pc = 0;
 
   while (true) {
 #ifdef DO_WEVAL
