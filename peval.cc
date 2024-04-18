@@ -104,7 +104,7 @@ static NEVER_INLINE Object Execute(uword *program) {
   weval::pop_context();
 }
 
-Object (*ExecuteSpecialized)(uword *);
+Object (*ExecuteSpecialized)(uword *) = 0;
 
 enum {
   result,
@@ -147,7 +147,11 @@ WEVAL_DEFINE_GLOBALS();
 
 int main(int argc, char **argv) {
 
-  Execute(program);
+  if (ExecuteSpecialized) {
+    ExecuteSpecialized(nullptr);
+  } else {
+    Execute(program);
+  }
 
   // uint32_t result = add_result(0, 0);
   // std::cout << result << std::endl;
