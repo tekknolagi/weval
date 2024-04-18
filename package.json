@@ -1,0 +1,5 @@
+{
+  "dependencies": {
+    "@runno/wasi": "^0.7.0"
+  }
+}
