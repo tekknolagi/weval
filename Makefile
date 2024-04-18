@@ -36,4 +36,7 @@ bench: peval.out peval.normal.cwasm peval.wevaled.cwasm
 		"../wasmtime/target/release/wasmtime run --allow-precompiled peval.normal.cwasm" \
 		"../wasmtime/target/release/wasmtime run --allow-precompiled peval.wevaled.cwasm"
 
-.PHONY: bench
+clean:
+	rm -f *.out *.wasm *.cwasm *.wat
+
+.PHONY: bench clean
