@@ -40,6 +40,7 @@ static NEVER_INLINE Object Execute(uword *program) {
   Object tmp;
 #define DO_PUSH(x) (stack[sp++] = (x))
 #define DO_POP() (tmp = stack[--sp], stack[sp] = (Object)0, tmp)
+#ifdef __wasi__
 #define LOCAL_AT(idx) (IsSpecialized ? weval_read_reg(idx) : locals[idx])
 #define LOCAL_AT_PUT(idx, val)                                                 \
   if (IsSpecialized) {                                                         \
@@ -47,12 +48,20 @@ static NEVER_INLINE Object Execute(uword *program) {
   } else {                                                                     \
     locals[idx] = val;                                                         \
   }
+#else
+#define LOCAL_AT(idx) (locals[idx])
+#define LOCAL_AT_PUT(idx, val) (locals[idx] = val)
+#endif
 
+#ifdef __wasi__
   weval::push_context(0);
+#endif
   uword pc = 0;
 
   while (true) {
+#ifdef __wasi__
     weval_assert_const32(pc, __LINE__);
+#endif
     Instruction op = (Instruction)program[pc++];
     switch (op) {
     case LOAD_IMMEDIATE: {
@@ -108,9 +117,13 @@ static NEVER_INLINE Object Execute(uword *program) {
       return 0;
     }
     }
+#ifdef __wasi__
     weval::update_context(pc);
+#endif
   }
+#ifdef __wasi__
   weval::pop_context();
+#endif
 }
 
 Object (*ExecuteSpecialized)(uword *) = 0;
