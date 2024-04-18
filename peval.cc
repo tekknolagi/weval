@@ -1,7 +1,13 @@
 #include <cstdint>
 #include <iostream>
 
-#ifdef __wasi__
+#ifdef DO_WEVAL
+#ifndef __wasi__
+#error "DO_WEVAL is only supported on WASI"
+#endif
+#endif
+
+#ifdef DO_WEVAL
 #include "weval.h"
 #include "wizer.h"
 #endif
@@ -40,7 +46,7 @@ static NEVER_INLINE Object Execute(uword *program) {
   Object tmp;
 #define DO_PUSH(x) (stack[sp++] = (x))
 #define DO_POP() (tmp = stack[--sp], stack[sp] = (Object)0, tmp)
-#ifdef __wasi__
+#ifdef DO_WEVAL
 #define LOCAL_AT(idx) (IsSpecialized ? weval_read_reg(idx) : locals[idx])
 #define LOCAL_AT_PUT(idx, val)                                                 \
   if (IsSpecialized) {                                                         \
@@ -53,13 +59,13 @@ static NEVER_INLINE Object Execute(uword *program) {
 #define LOCAL_AT_PUT(idx, val) (locals[idx] = val)
 #endif
 
-#ifdef __wasi__
+#ifdef DO_WEVAL
   weval::push_context(0);
 #endif
   uword pc = 0;
 
   while (true) {
-#ifdef __wasi__
+#ifdef DO_WEVAL
     weval_assert_const32(pc, __LINE__);
 #endif
     Instruction op = (Instruction)program[pc++];
@@ -117,11 +123,11 @@ static NEVER_INLINE Object Execute(uword *program) {
       return 0;
     }
     }
-#ifdef __wasi__
+#ifdef DO_WEVAL
     weval::update_context(pc);
 #endif
   }
-#ifdef __wasi__
+#ifdef DO_WEVAL
   weval::pop_context();
 #endif
 }
@@ -155,7 +161,7 @@ uword program[] = {
 };
 // clang-format on
 
-#ifdef __wasi__
+#ifdef DO_WEVAL
 void init() {
   uword result = 0;
   uword loopc = 1;
