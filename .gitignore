@@ -6,3 +6,6 @@ target/
 cache.db
 npm/weval/package-lock.json
 **/node_modules
+*.wat
+*.cwasm
+*.out
