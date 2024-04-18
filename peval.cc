@@ -40,6 +40,7 @@ static NEVER_INLINE Object Execute(uword *program) {
 #define DO_PUSH(x) (stack[sp++] = (x))
 #define DO_POP() (tmp = stack[--sp], stack[sp] = (Object)0, tmp)
 
+  weval::push_context(0);
   uword pc = 0;
 
   while (true) {
@@ -98,7 +99,9 @@ static NEVER_INLINE Object Execute(uword *program) {
       return 0;
     }
     }
+    weval::update_context(pc);
   }
+  weval::pop_context();
 }
 
 Object (*ExecuteSpecialized)(uword *);
