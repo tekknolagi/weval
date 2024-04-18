@@ -106,7 +106,7 @@ Object (*ExecuteSpecialized)(uword *);
 enum {
   result,
   loopc,
-  goal=100000000,
+  goal = 100000000,
 };
 // clang-format off
 uword program[] = {
@@ -135,8 +135,7 @@ void init() {
   uword result = 0;
   uword loopc = 1;
   weval::weval(&ExecuteSpecialized, &Execute, 123,
-               weval::SpecializeMemory<uword *>(
-                   program, (sizeof program) / (sizeof *program)));
+               weval::SpecializeMemory<uword *>(program, sizeof program));
 }
 
 WIZER_INIT(init);
