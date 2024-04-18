@@ -52,6 +52,7 @@ static NEVER_INLINE Object Execute(uword *program) {
   uword pc = 0;
 
   while (true) {
+    weval_assert_const32(pc, __LINE__);
     Instruction op = (Instruction)program[pc++];
     switch (op) {
     case LOAD_IMMEDIATE: {
