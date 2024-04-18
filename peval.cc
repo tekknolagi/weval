@@ -1,3 +1,4 @@
+#include <cinttypes>
 #include <cstdint>
 #include <iostream>
 
@@ -91,7 +92,7 @@ static NEVER_INLINE Object Execute(uword *program) {
       break;
     }
     case PRINTI: {
-      printf("%llu", accumulator);
+      printf("%" PRIu64, accumulator);
       break;
     }
     case HALT: {
