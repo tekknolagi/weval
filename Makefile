@@ -1,10 +1,10 @@
 WASI_CXX=/opt/wasi-sdk/bin/clang++
-CXXFLAGS=-O2 -I include
-peval.out: peval.cc include/wizer.h include/weval.h
+CXXFLAGS=-O2
+peval.out: peval.cc
 	$(CXX) $(CXXFLAGS) $< -o $@
 
 peval.wasm: peval.cc include/wizer.h include/weval.h
-	$(WASI_CXX) $(CXXFLAGS) -DDO_WEVAL $< -o $@
+	$(WASI_CXX) $(CXXFLAGS) -DDO_WEVAL -I include $< -o $@
 
 peval.normal.wasm: peval.cc
 	$(WASI_CXX) $(CXXFLAGS) $< -o $@
