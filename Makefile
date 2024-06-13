@@ -1,5 +1,5 @@
 WASI_CXX=/opt/wasi-sdk/bin/clang++
-CXXFLAGS=-O2
+CXXFLAGS=-O2 -flto
 peval.out: peval.cc
 	$(CXX) $(CXXFLAGS) $< -o $@
 
