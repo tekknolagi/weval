@@ -166,7 +166,7 @@ uword program[] = {
 void init() {
   uword result = 0;
   uword loopc = 1;
-  weval::weval(&ExecuteSpecialized, &Execute<true>, 123,
+  weval::weval(&ExecuteSpecialized, &Execute<true>, 123, /*num_globals=*/0,
                weval::SpecializeMemory<uword *>(program, sizeof program));
 }
 
