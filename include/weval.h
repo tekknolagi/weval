@@ -1,5 +1,6 @@
 #pragma once
 
+#include <assert.h>
 #include <stdint.h>
 #include <stdlib.h>
 #include <string.h>
@@ -114,6 +115,32 @@ static inline void weval_free(weval_req_t* req) {
     free(req->argbuf);
   }
   free(req);
+}
+
+static inline weval_req_t *weval_build_request(weval_func_t func, weval_func_t *specialized) {
+  weval_req_t *result = (weval_req_t *)malloc(sizeof *result);
+  memset(result, 0, sizeof *result);
+  result->func = func;
+  result->specialized = specialized;
+  return result;
+}
+
+// Align to 8-byte boundary.
+static inline uint32_t weval_align_len(uint32_t len) { return (len + 7) & ~7; }
+
+static inline void weval_append_memory_arg(weval_req_t *req, void* data, uint32_t len) {
+  weval_req_arg_t arg = {
+    .specialize = 1,
+    .ty = weval_req_arg_buffer,
+  };
+  arg.u.buffer.len = len;
+  arg.u.buffer.padded_len = weval_align_len(len);
+  size_t new_size = arg.u.buffer.padded_len + sizeof arg;
+  req->argbuf = (uint8_t*)realloc(req->argbuf, req->arglen + new_size);
+  assert(req->argbuf != NULL && "Could not realloc");
+  memcpy(req->argbuf + req->arglen, &arg, sizeof arg);
+  memcpy(req->argbuf + req->arglen + sizeof arg, data, len);
+  req->arglen += new_size;
 }
 
 /* ------------------------------------------------------------------------- */
@@ -407,7 +434,7 @@ struct StoreArgs<SpecializeMemory<T>, Rest...> {
     arg.ty = weval_req_arg_buffer;
     arg.u.raw = 0;
     arg.u.buffer.len = arg0.len;
-    arg.u.buffer.padded_len = (arg0.len + 7) & ~7;  // Align to 8-byte boundary.
+    arg.u.buffer.padded_len = weval_align_len(arg0.len);
     if (!args.write(arg)) {
       return false;
     }

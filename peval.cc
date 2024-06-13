@@ -166,8 +166,10 @@ uword program[] = {
 void init() {
   uword result = 0;
   uword loopc = 1;
-  weval::weval(&ExecuteSpecialized, &Execute<true>, 123, /*num_globals=*/0,
-               weval::SpecializeMemory<uword *>(program, sizeof program));
+  weval_req_t *req = weval_build_request((weval_func_t)&Execute<true>,
+                                         (weval_func_t *)&ExecuteSpecialized);
+  weval_append_memory_arg(req, program, sizeof program);
+  weval_request(req);
 }
 
 WIZER_INIT(init);
