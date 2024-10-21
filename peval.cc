@@ -42,11 +42,8 @@ template <bool IsSpecialized>
 static NEVER_INLINE Object Execute(uword *program) {
   Object accumulator = 0;
   Object locals[256] = {0};
-  Object stack[256] = {0};
   word sp = 0;
   Object tmp;
-#define DO_PUSH(x) (stack[sp++] = (x))
-#define DO_POP() (tmp = stack[--sp], stack[sp] = (Object)0, tmp)
 #ifdef DO_WEVAL
 #define LOCAL_AT(idx) (IsSpecialized ? weval_read_reg(idx) : locals[idx])
 #define LOCAL_AT_PUT(idx, val)                                                 \
