@@ -3,14 +3,14 @@ CXXFLAGS=-O2 -flto
 peval.out: peval.cc
 	$(CXX) $(CXXFLAGS) $< -o $@
 
-peval.opt_locals.wasm: peval.cc include/wizer.h include/weval.h
-	$(WASI_CXX) $(CXXFLAGS) -DDO_WEVAL -DSPECIALIZE_LOCALS -I include $< -o $@
-
 peval.wasm: peval.cc include/wizer.h include/weval.h
 	$(WASI_CXX) $(CXXFLAGS) -DDO_WEVAL -I include $< -o $@
 
 peval.normal.wasm: peval.cc
 	$(WASI_CXX) $(CXXFLAGS) $< -o $@
+
+peval.opt_locals.wasm: peval.cc include/wizer.h include/weval.h
+	$(WASI_CXX) $(CXXFLAGS) -DDO_WEVAL -DSPECIALIZE_LOCALS -I include $< -o $@
 
 %.cwasm: %.wasm
 	../wasmtime/target/release/wasmtime compile $< -o $@
