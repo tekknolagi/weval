@@ -89,9 +89,9 @@ static NEVER_INLINE Object Execute(uword *program) {
       return accumulator;
     }
     case JMPNZ: {
-      uword offset = program[pc++];
+      uword address = program[pc++];
       if (accumulator != 0) {
-        pc = offset;
+        pc = address;
       }
       break;
     }
