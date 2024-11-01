@@ -42,16 +42,9 @@ template <bool IsSpecialized>
 static NEVER_INLINE Object Execute(uword *program) {
   Object accumulator = 0;
   Object locals[256] = {0};
-  word sp = 0;
-  Object tmp;
-#ifdef DO_WEVAL
-#define LOCAL_AT(idx) (IsSpecialized ? weval_read_reg(idx) : locals[idx])
-#define LOCAL_AT_PUT(idx, val)                                                 \
-  if (IsSpecialized) {                                                         \
-    weval_write_reg(idx, val);                                                 \
-  } else {                                                                     \
-    locals[idx] = val;                                                         \
-  }
+#if defined(DO_WEVAL) && defined(SPECIALIZE_LOCALS)
+#define LOCAL_AT(idx) weval_read_reg(idx)
+#define LOCAL_AT_PUT(idx, val) weval_write_reg(idx, val)
 #else
 #define LOCAL_AT(idx) (locals[idx])
 #define LOCAL_AT_PUT(idx, val) (locals[idx] = val)
