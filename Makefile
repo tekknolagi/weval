@@ -30,7 +30,7 @@ manual.out: manual.c
 manual_unrolled.out: manual.c
 	$(CC) -O2 -DNO_UNROLL= $< -o $@
 
-bench: peval.out peval.normal.cwasm peval.wevaled.cwasm \
+results.json: peval.out peval.normal.cwasm peval.wevaled.cwasm \
 	peval.opt_locals.wevaled.cwasm manual.out manual_unrolled.out
 	hyperfine --warmup 1 --export-json results.json \
 		"./manual.out" \
@@ -44,7 +44,12 @@ bench: peval.out peval.normal.cwasm peval.wevaled.cwasm \
 		# "~/.bun/bin/bun wrapper.mjs peval.normal.wasm" \
 		# "~/.bun/bin/bun wrapper.mjs peval.wevaled.wasm"
 
+results.pdf: results.json Makefile plot_whisker.py
+	python3 plot_whisker.py results.json --output results.pdf \
+		--title "Rufus loop runtime by execution strategy" \
+		--labels "C,C (unrolled),Interp (Native),Interp (Wasm),weval,weval+locals"
+
 clean:
 	rm -f *.out *.wasm *.cwasm *.wat
 
-.PHONY: bench clean
+.PHONY: clean
