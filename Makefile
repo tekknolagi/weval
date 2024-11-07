@@ -24,8 +24,17 @@ peval.opt_locals.wasm: peval.cc include/wizer.h include/weval.h
 ./target/release/weval:
 	cargo build --release
 
-bench: peval.out peval.normal.cwasm peval.wevaled.cwasm peval.opt_locals.wevaled.cwasm
-	hyperfine \
+manual.out: manual.c
+	$(CC) -O2 -DNO_UNROLL=volatile $< -o $@
+
+manual_unrolled.out: manual.c
+	$(CC) -O2 -DNO_UNROLL= $< -o $@
+
+bench: peval.out peval.normal.cwasm peval.wevaled.cwasm \
+	peval.opt_locals.wevaled.cwasm manual.out manual_unrolled.out
+	hyperfine --warmup 1 --export-json results.json \
+		"./manual.out" \
+		"./manual_unrolled.out" \
 		"./peval.out" \
 		"../wasmtime/target/release/wasmtime run --allow-precompiled peval.normal.cwasm" \
 		"../wasmtime/target/release/wasmtime run --allow-precompiled peval.wevaled.cwasm" \
