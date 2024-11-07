@@ -12,6 +12,7 @@ Quoting from the matplotlib documentation:
 import argparse
 import json
 import matplotlib.pyplot as plt
+import numpy as np
 
 parser = argparse.ArgumentParser(description=__doc__)
 parser.add_argument("file", help="JSON file with benchmark results")
@@ -34,17 +35,14 @@ else:
     labels = [b["command"].split(" ")[0] for b in results]
 times = [b["times"] for b in results]
 
-boxplot = plt.boxplot(times, vert=True, patch_artist=True)
-cmap = plt.get_cmap("rainbow")
-colors = [cmap(val / len(times)) for val in range(len(times))]
-
-for patch, color in zip(boxplot["boxes"], colors):
-    patch.set_facecolor(color)
-
+means = [np.mean(t) for t in times]
+stdevs = [np.std(t) for t in times]
+x = np.arange(len(means))
+plt.bar(x, means, yerr=stdevs)
 if args.title:
     plt.title(args.title)
 plt.subplots_adjust(bottom=0.20)
-plt.xticks(range(1,len(labels)+1), labels, rotation=45)
+plt.xticks(range(0,len(labels)), labels, rotation=45)
 plt.ylabel("Time [s]")
 plt.ylim(0, None)
 if args.output:
