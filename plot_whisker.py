@@ -38,11 +38,11 @@ times = [b["times"] for b in results]
 means = [np.mean(t) for t in times]
 stdevs = [np.std(t) for t in times]
 x = np.arange(len(means))
+plt.rcParams["figure.figsize"] = (15,5)
 plt.bar(x, means, yerr=stdevs)
 if args.title:
     plt.title(args.title)
-plt.subplots_adjust(bottom=0.20)
-plt.xticks(range(0,len(labels)), labels, rotation=45)
+plt.xticks(range(0,len(labels)), labels)
 plt.ylabel("Time [s]")
 plt.ylim(0, None)
 if args.output:
