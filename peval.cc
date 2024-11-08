@@ -41,13 +41,13 @@ typedef enum {
 template <bool IsSpecialized>
 static NEVER_INLINE Object Execute(uword *program) {
   Object accumulator = 0;
-  Object locals[256] = {0};
+  Object registers[256] = {0};
 #if defined(DO_WEVAL) && defined(SPECIALIZE_LOCALS)
 #define LOCAL_AT(idx) weval_read_reg(idx)
 #define LOCAL_AT_PUT(idx, val) weval_write_reg(idx, val)
 #else
-#define LOCAL_AT(idx) (locals[idx])
-#define LOCAL_AT_PUT(idx, val) (locals[idx] = val)
+#define LOCAL_AT(idx) (registers[idx])
+#define LOCAL_AT_PUT(idx, val) (registers[idx] = val)
 #endif
 
 #ifdef DO_WEVAL
