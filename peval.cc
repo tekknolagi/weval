@@ -22,8 +22,8 @@ typedef uword Object;
 
 #define FOR_EACH_INSTRUCTION(V)                                                \
   V(LOAD_IMMEDIATE)                                                            \
-  V(STORE_LOCAL)                                                               \
-  V(LOAD_LOCAL)                                                                \
+  V(STORE_REGISTER)                                                               \
+  V(LOAD_REGISTER)                                                                \
   V(PRINT)                                                                     \
   V(PRINTI)                                                                    \
   V(JMPNZ)                                                                     \
@@ -42,12 +42,12 @@ template <bool IsSpecialized>
 static NEVER_INLINE Object Execute(uword *program) {
   Object accumulator = 0;
   Object registers[256] = {0};
-#if defined(DO_WEVAL) && defined(SPECIALIZE_LOCALS)
-#define LOCAL_AT(idx) weval_read_reg(idx)
-#define LOCAL_AT_PUT(idx, val) weval_write_reg(idx, val)
+#if defined(DO_WEVAL) && defined(SPECIALIZE_REGISTERS)
+#define REGISTER_AT(idx) weval_read_reg(idx)
+#define REGISTER_AT_PUT(idx, val) weval_write_reg(idx, val)
 #else
-#define LOCAL_AT(idx) (registers[idx])
-#define LOCAL_AT_PUT(idx, val) (registers[idx] = val)
+#define REGISTER_AT(idx) (registers[idx])
+#define REGISTER_AT_PUT(idx, val) (registers[idx] = val)
 #endif
 
 #ifdef DO_WEVAL
@@ -66,14 +66,14 @@ static NEVER_INLINE Object Execute(uword *program) {
       accumulator = (Object)value;
       break;
     }
-    case STORE_LOCAL: {
+    case STORE_REGISTER: {
       uword idx = program[pc++];
-      LOCAL_AT_PUT(idx, accumulator);
+      REGISTER_AT_PUT(idx, accumulator);
       break;
     }
-    case LOAD_LOCAL: {
+    case LOAD_REGISTER: {
       uword idx = program[pc++];
-      accumulator = LOCAL_AT(idx);
+      accumulator = REGISTER_AT(idx);
       break;
     }
     case PRINT: {
@@ -106,7 +106,7 @@ static NEVER_INLINE Object Execute(uword *program) {
     case ADD: {
       uword idx1 = program[pc++];
       uword idx2 = program[pc++];
-      accumulator = LOCAL_AT(idx1) + LOCAL_AT(idx2);
+      accumulator = REGISTER_AT(idx1) + REGISTER_AT(idx2);
       break;
     }
     default: {
@@ -133,19 +133,19 @@ enum {
 // clang-format off
 uword program[] = {
   LOAD_IMMEDIATE, 0,
-  STORE_LOCAL, result,
+  STORE_REGISTER, result,
   LOAD_IMMEDIATE, goal,
-  STORE_LOCAL, loopc,
+  STORE_REGISTER, loopc,
 
   ADD, result, loopc,
-  STORE_LOCAL, result,
-  LOAD_LOCAL, loopc,
+  STORE_REGISTER, result,
+  LOAD_REGISTER, loopc,
   DEC,
-  STORE_LOCAL, loopc,
+  STORE_REGISTER, loopc,
   JMPNZ, 8,
 
   PRINT, (uword)"Result: ",
-  LOAD_LOCAL, result,
+  LOAD_REGISTER, result,
   PRINTI,
   PRINT, (uword)"\n",
   HALT,
